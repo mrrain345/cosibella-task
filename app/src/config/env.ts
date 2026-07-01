@@ -14,6 +14,8 @@ const EnvSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
+  IDOSELL_DOMAIN: z.string().nonempty(),
+  IDOSELL_API_KEY: z.string().nonempty(),
 })
 
 export const env = EnvSchema.parse(process.env)
