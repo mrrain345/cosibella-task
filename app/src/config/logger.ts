@@ -7,7 +7,7 @@ const transport = pino.transport({
   options: {
     destination: 1,
     all: true,
-    colorize: process.stdout.isTTY,
+    colorize: true,
     translateTime: true,
   },
 })

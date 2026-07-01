@@ -1,5 +1,10 @@
-import "dotenv/config"
+import dotenv from "dotenv"
 import { z } from "zod"
+
+dotenv.config({
+  path: ["../.env"],
+  quiet: true,
+})
 
 const EnvSchema = z.object({
   PORT: z.coerce.number().default(3000),

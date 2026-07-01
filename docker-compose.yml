@@ -1,0 +1,25 @@
+services:
+  app:
+    container_name: masterborn-app
+    build:
+      context: app
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: ${BASE_IMAGE}
+        PORT: ${PORT}
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT}
+      LOG_LEVEL: ${LOG_LEVEL}
+    ports:
+      - "${PORT}:${PORT}"
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./app
+          target: /app
+        - action: rebuild
+          path: ./app/package.json
+        - action: rebuild
+          path: ./.env
