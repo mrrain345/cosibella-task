@@ -1,7 +1,7 @@
 import { Router } from "express"
 
-export const main = Router()
+export const mainRouter = Router()
 
-main.get("/", (req, res) => {
+mainRouter.get("/", (req, res) => {
   res.send({})
 })

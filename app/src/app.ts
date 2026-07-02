@@ -4,7 +4,8 @@ import { loggerHttp } from "./config/logger"
 import { notFoundHandler } from "./middlewares/not-found-handler"
 import { errorHandler } from "./middlewares/error-handler"
 
-import { main } from "./routes/main"
+import { mainRouter } from "./routes/main"
+import { ordersRouter } from "./routes/orders"
 
 export const app = express()
 
@@ -14,7 +15,8 @@ app.use(express.json())
 app.use(loggerHttp)
 
 // Routes
-app.use(main)
+app.use(mainRouter)
+app.use(ordersRouter)
 
 // Error Handlers
 app.use(notFoundHandler)
