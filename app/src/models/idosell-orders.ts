@@ -4,7 +4,7 @@ import { IdosellClient, idosellClient } from "./idosell-client"
 import { idosellOrderSchema } from "../schemas/order"
 
 const searchParams = z.object({
-  shippmentStatus: z.enum(["all", "received", "non-received"]).optional(),
+  shippmentStatus: z.enum(["all", "received", "non-received"]).default("all"),
   resultsLimit: z.number().int().positive().optional(),
   resultsPage: z.number().int().nonnegative().optional(),
 })
