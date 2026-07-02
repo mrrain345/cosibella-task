@@ -1,8 +1,19 @@
-import { sql } from "drizzle-orm"
+import { asc } from "drizzle-orm"
 import { db } from "../db/client"
-import { documents, orders, NewDocument, NewOrder } from "../db/schema"
+import {
+  NewOrder,
+  NewSalesConfirmation,
+  NewVatInvoice,
+  orders,
+  salesConfirmations,
+  vatInvoices,
+} from "../db/schema"
 import { IdosellDocument } from "../schemas/document"
 import { OrderWithDocuments } from "./orders"
+
+type GetOrdersOptions = {
+  withPdf?: boolean
+}
 
 /** Service for persisting IdoSell orders and their documents to the database. */
 export class DatabaseService {
@@ -39,37 +50,109 @@ export class DatabaseService {
           updatedAt: new Date(),
         },
       })
-      .returning({ id: orders.id })
+      .returning({ id: orders.orderSerialNumber })
 
-    if (orderWithDocuments.documents.length > 0) {
-      await this._upsertDocuments(
-        upsertedOrder.id,
-        orderWithDocuments.documents,
-      )
-    }
+    const salesConfirmation = orderWithDocuments.documents.find(
+      (d) => d.documentType === "sales_confirmation",
+    )
+    const vatInvoice = orderWithDocuments.documents.find(
+      (d) => d.documentType === "vat_invoice",
+    )
+
+    await Promise.all([
+      salesConfirmation &&
+        this._upsertSalesConfirmation(upsertedOrder.id, salesConfirmation),
+      vatInvoice && this._upsertVatInvoice(upsertedOrder.id, vatInvoice),
+    ])
   }
 
-  /** Upsert documents for a given internal order ID. */
-  private async _upsertDocuments(
-    orderId: number,
-    docs: IdosellDocument[],
+  /** Upsert a sales confirmation document for a given internal order ID. */
+  private async _upsertSalesConfirmation(
+    orderSerialNumber: number,
+    doc: IdosellDocument,
   ): Promise<void> {
-    const newDocuments: NewDocument[] = docs.map((doc) => ({
-      externalDocumentId: doc.id,
-      orderId,
-      documentType: doc.documentType as "sales_confirmation" | "vat_invoice",
-    }))
+    if (!doc.documentId) return
+
+    const values: NewSalesConfirmation = {
+      orderSerialNumber,
+      documentId: doc.documentId,
+      documentName: doc.documentName ?? null,
+      documentPurchaseDate: doc.documentPurchaseDate ?? null,
+      documentIssuedDate: doc.documentIssuedDate ?? null,
+      pdfWithDocumentsInBase64: doc.pdfWithDocumentsInBase64 ?? null,
+    }
 
     await this._db
-      .insert(documents)
-      .values(newDocuments)
+      .insert(salesConfirmations)
+      .values(values)
       .onConflictDoUpdate({
-        target: documents.externalDocumentId,
+        target: salesConfirmations.orderSerialNumber,
         set: {
-          orderId: sql`excluded.order_id`,
-          documentType: sql`excluded.document_type`,
+          documentId: values.documentId,
+          documentName: values.documentName,
+          documentPurchaseDate: values.documentPurchaseDate,
+          documentIssuedDate: values.documentIssuedDate,
+          pdfWithDocumentsInBase64: values.pdfWithDocumentsInBase64,
+          updatedAt: new Date(),
         },
       })
+  }
+
+  /** Upsert a VAT invoice document for a given internal order ID. */
+  private async _upsertVatInvoice(
+    orderSerialNumber: number,
+    doc: IdosellDocument,
+  ): Promise<void> {
+    if (!doc.documentId) return
+
+    const values: NewVatInvoice = {
+      orderSerialNumber,
+      documentId: doc.documentId,
+      documentName: doc.documentName ?? null,
+      documentPurchaseDate: doc.documentPurchaseDate ?? null,
+      documentIssuedDate: doc.documentIssuedDate ?? null,
+      orderPaymentDate: doc.orderPaymentDate ?? null,
+      ksefNumber: doc.ksefNumber ?? null,
+      ksefDocumentStatus: doc.ksefDocumentStatus ?? null,
+      correctedInvoiceId: doc.correctedInvoiceId ?? null,
+      pdfWithDocumentsInBase64: doc.pdfWithDocumentsInBase64 ?? null,
+    }
+
+    await this._db
+      .insert(vatInvoices)
+      .values(values)
+      .onConflictDoUpdate({
+        target: vatInvoices.orderSerialNumber,
+        set: {
+          documentId: values.documentId,
+          documentName: values.documentName,
+          documentPurchaseDate: values.documentPurchaseDate,
+          documentIssuedDate: values.documentIssuedDate,
+          orderPaymentDate: values.orderPaymentDate,
+          ksefNumber: values.ksefNumber,
+          ksefDocumentStatus: values.ksefDocumentStatus,
+          correctedInvoiceId: values.correctedInvoiceId,
+          pdfWithDocumentsInBase64: values.pdfWithDocumentsInBase64,
+          updatedAt: new Date(),
+        },
+      })
+  }
+
+  /** Retrieve all orders with their associated documents from the database. */
+  async getOrders(options: GetOrdersOptions = {}) {
+    const { withPdf = false } = options
+
+    return this._db.query.orders.findMany({
+      with: {
+        salesConfirmation: {
+          columns: { pdfWithDocumentsInBase64: withPdf },
+        },
+        vatInvoice: {
+          columns: { pdfWithDocumentsInBase64: withPdf },
+        },
+      },
+      orderBy: asc(orders.orderSerialNumber),
+    })
   }
 
   /** Extract the products cost from an IdoSell order. */

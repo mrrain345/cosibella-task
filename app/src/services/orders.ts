@@ -76,7 +76,11 @@ export class OrdersService {
     )
 
     return results.flatMap((result) =>
-      result.status === "fulfilled" ? result.value.documents : [],
+      result.status === "fulfilled" ?
+        result.value.documents.filter(
+          (doc) => !doc.errors || doc.errors.faultCode === 0,
+        )
+      : [],
     )
   }
 

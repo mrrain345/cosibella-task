@@ -31,7 +31,7 @@ const idosellErrorSchema = z.object({
 export const idosellDocumentSchema = z.object({
   orderSerialNumber: z.number(),
   documentType: idosellDocumentTypeSchema,
-  id: z.number(),
+  id: z.number().optional(),
   documentId: z.string().optional(),
   documentName: z.string().optional(),
   ksefNumber: z.string().optional(),
