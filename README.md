@@ -1,89 +1,78 @@
-# Cosibella Task
+# Cosibella
 
-Recruitment application for Cosibella
-
-In the development mode Drizzle Studio is available at https://local.drizzle.studio
-
-Swagger documentation is available at http://localhost:3000/docs when the application is running.
+A Node.js backend service that integrates with the **IdoSell** e-commerce platform — synchronizing orders and their documents in the background, storing them in PostgreSQL, and exposing a REST API.
 
 ## Requirements
 
-- npm
-- docker
-- docker-compose-plugin
+- Node.js & npm
+- Docker with the Compose plugin
 
-## First run
+## Getting Started
 
-Remember to copy the `.env.example` file to `.env` and set the environment variables before running the application.
+1. **Copy the environment file and fill in the values:**
 
-```bash
-# Copy environment configuration
-cp .env.example .env
+   ```bash
+   cp .env.example .env
+   ```
 
-# Install dependencies
-npm install
+2. **Install dependencies:**
 
-# Set up the database
-npm run db:setup
+   ```bash
+   npm install
+   ```
 
-# Start the application (development mode)
-npm run docker:dev
+3. **Set up the database** (starts Postgres, runs migrations, then stops it):
 
-```
+   ```bash
+   npm run db:setup
+   ```
+
+4. **Start the application in development mode:**
+
+   ```bash
+   npm run docker:dev
+   ```
+
+Swagger documentation: http://localhost:3000/docs
+
+Drizzle Studio (dev mode only): https://local.drizzle.studio
+
+## Tech Stack
+
+- Express 5
+- TypeScript (tsx)
+- Drizzle ORM
+- PostgreSQL
+- Zod
+- Pino
+- Vitest
+- Docker
 
 ## Running the Application
 
-Development mode:
+| Command                | Description                         |
+| ---------------------- | ----------------------------------- |
+| `npm run docker:dev`   | Start with hot-reload (development) |
+| `npm run docker:start` | Start in production mode (detached) |
+| `npm run docker:logs`  | Tail container logs                 |
+| `npm run docker:stop`  | Stop all containers                 |
+
+## Testing
 
 ```bash
-# Start and watch the application
-npm run docker:dev
-```
-
-Production mode:
-
-```bash
-
-# Start the application
-npm run docker:start
-
-# Show logs
-npm run docker:logs
-
-# Stop the application
-npm run docker:stop
-
-```
-
-Tests:
-
-```bash
-# Run tests
+# Run tests once
 npm run test
 
-# Watch tests
-npm run: test:watch
+# Watch mode
+npm run test:watch
 ```
 
-## Drizzle commands
+## Database Commands
 
-```bash
-# Generate and apply migrations in one step
-# Automatically starts and stops the database container
-npm run db:setup
-
-
-# Generate migration files from schema changes
-npm run db:generate
-
-# Apply generated migrations
-# Requires `docker:start` to be running
-npm run db:migrate
-
-# Apply schema changes directly to the database
-# Use with caution, requires `docker:start` to be running
-npm run db:push
-
-# Clean the database (deletes the database volume and the drizzle folder)
-npm run db:clean
-```
+| Command               | Description                                             |
+| --------------------- | ------------------------------------------------------- |
+| `npm run db:setup`    | Generate migrations & apply them (auto-starts/stops DB) |
+| `npm run db:generate` | Generate migration files from schema changes            |
+| `npm run db:migrate`  | Apply pending migrations (requires running DB)          |
+| `npm run db:push`     | Push schema directly to DB, skipping migrations         |
+| `npm run db:clean`    | Drop the DB volume and delete the `drizzle/` folder     |
