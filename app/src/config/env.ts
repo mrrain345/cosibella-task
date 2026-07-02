@@ -18,6 +18,7 @@ const EnvSchema = z.object({
 
   IDOSELL_DOMAIN: z.string().nonempty(),
   IDOSELL_API_KEY: z.string().nonempty(),
+  IDOSELL_SYNC_INTERVAL_SEC: z.coerce.number().int().positive().default(300),
 
   POSTGRES_USER: z.string().nonempty(),
   POSTGRES_PASSWORD: z.string().nonempty(),

@@ -2,14 +2,17 @@ import { env } from "./config/env"
 import { app } from "./app"
 import { logger } from "./config/logger"
 import { closeDbConnection } from "./db/client"
+import { syncJob } from "./jobs/sync"
 
 async function start() {
   app.listen(env.PORT, () => {
     logger.info(`Server running on port ${env.PORT}`)
   })
+  syncJob.start()
 }
 
 async function stop() {
+  syncJob.stop()
   await closeDbConnection()
   process.exit(0)
 }
