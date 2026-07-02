@@ -128,25 +128,7 @@ registry.registerPath({
     },
   },
   responses: {
-    204: { description: "Cost updated successfully" },
-    400: { description: "Invalid request body or path parameters" },
-    404: { description: "Order not found" },
-  },
-})
-
-registry.registerPath({
-  method: "put",
-  path: "/api/orders/{orderSerialNumber}/cost",
-  summary: "Update products cost",
-  description: "Overrides the products cost for a given order.",
-  request: {
-    params: orderSerialNumberParam,
-    body: {
-      content: { "application/json": { schema: updateCostBodySchema } },
-    },
-  },
-  responses: {
-    204: { description: "Cost updated successfully" },
+    200: { description: "Cost updated successfully" },
     400: { description: "Invalid request body or path parameters" },
     404: { description: "Order not found" },
   },

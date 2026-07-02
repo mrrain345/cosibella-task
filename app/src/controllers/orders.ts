@@ -79,7 +79,7 @@ export class OrdersController {
     res.json(order)
   }
 
-  /** Handle `PATCH/PUT /api/orders/:orderSerialNumber/cost` to update products cost. */
+  /** Handle `PATCH /api/orders/:orderSerialNumber/cost` to update products cost. */
   updateProductsCost = async (req: Request, res: Response): Promise<void> => {
     const paramsResult = pathParamsSchema.safeParse(req.params)
     if (!paramsResult.success) {
