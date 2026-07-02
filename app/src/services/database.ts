@@ -162,6 +162,28 @@ export class DatabaseService {
     }))
   }
 
+  /** Retrieve a single order with its associated documents from the database. */
+  async getOrder(orderSerialNumber: number, options: GetOrdersOptions = {}) {
+    const { withPdf = false } = options
+
+    const row = await this._db.query.orders.findFirst({
+      where: eq(orders.orderSerialNumber, orderSerialNumber),
+      with: {
+        salesConfirmation: {
+          columns: { pdfWithDocumentsInBase64: withPdf },
+        },
+        vatInvoice: {
+          columns: { pdfWithDocumentsInBase64: withPdf },
+        },
+      },
+    })
+
+    if (!row) return null
+
+    const { productsCost, productsCostOverride, ...rest } = row
+    return { ...rest, productsCost: productsCostOverride ?? productsCost }
+  }
+
   /** Update only the products cost override for a single order. */
   async updateProductsCost(
     orderSerialNumber: number,

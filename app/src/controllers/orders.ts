@@ -2,15 +2,18 @@ import { Request, Response } from "express"
 import { DatabaseService, databaseService } from "../services/database"
 import z from "zod"
 
-const getOrdersParams = z.object({
+/** Query param to include PDF documents in the response. */
+const withPdfSchema = z.object({
   withPdf: z.stringbool().default(false),
 })
 
-const updateOrderParams = z.object({
+/** Path param for orderSerialNumber in the request URL. */
+const pathParamsSchema = z.object({
   orderSerialNumber: z.coerce.number().int().positive(),
 })
 
-const updateOrderBody = z.object({
+/** Request body for updating the products cost of a single order. */
+const updateCostBodySchema = z.object({
   productsCost: z
     .number()
     .nonnegative()
@@ -27,7 +30,7 @@ export class OrdersController {
 
   /** Handle `GET /api/orders` request to retrieve all orders with their documents. */
   getOrders = async (req: Request, res: Response): Promise<void> => {
-    const parseResult = getOrdersParams.safeParse(req.query)
+    const parseResult = withPdfSchema.safeParse(req.query)
 
     if (!parseResult.success) {
       res.status(400).json({
@@ -42,9 +45,9 @@ export class OrdersController {
     res.json(orders)
   }
 
-  /** Handle `PATCH/PUT /api/orders/:orderSerialNumber/cost` to update products cost. */
-  updateProductsCost = async (req: Request, res: Response): Promise<void> => {
-    const paramsResult = updateOrderParams.safeParse(req.params)
+  /** Handle `GET /api/orders/:orderSerialNumber` to retrieve a single order. */
+  getSingleOrder = async (req: Request, res: Response): Promise<void> => {
+    const paramsResult = pathParamsSchema.safeParse(req.params)
     if (!paramsResult.success) {
       res.status(400).json({
         error: "Invalid path parameters",
@@ -53,7 +56,41 @@ export class OrdersController {
       return
     }
 
-    const bodyResult = updateOrderBody.safeParse(req.body)
+    const parseResult = withPdfSchema.safeParse(req.query)
+    if (!parseResult.success) {
+      res.status(400).json({
+        error: "Invalid query parameters",
+        details: z.prettifyError(parseResult.error),
+      })
+      return
+    }
+
+    const { orderSerialNumber } = paramsResult.data
+    const { withPdf } = parseResult.data
+    const order = await this._databaseService.getOrder(orderSerialNumber, {
+      withPdf,
+    })
+
+    if (!order) {
+      res.status(404).json({ error: "Order not found" })
+      return
+    }
+
+    res.json(order)
+  }
+
+  /** Handle `PATCH/PUT /api/orders/:orderSerialNumber/cost` to update products cost. */
+  updateProductsCost = async (req: Request, res: Response): Promise<void> => {
+    const paramsResult = pathParamsSchema.safeParse(req.params)
+    if (!paramsResult.success) {
+      res.status(400).json({
+        error: "Invalid path parameters",
+        details: z.prettifyError(paramsResult.error),
+      })
+      return
+    }
+
+    const bodyResult = updateCostBodySchema.safeParse(req.body)
     if (!bodyResult.success) {
       res.status(400).json({
         error: "Invalid request body",
