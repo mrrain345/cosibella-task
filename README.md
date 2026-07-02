@@ -1,6 +1,6 @@
-# MaserBorn App
+# Cosibella Task
 
-Recruitment application for MaserBorn
+Recruitment application for Cosibella
 
 ## Requirements
 
@@ -15,6 +15,9 @@ Remember to copy the `.env.example` file to `.env` and set the environment varia
 ```bash
 # Copy environment configuration
 cp .env.example .env
+
+# Install dependencies
+npm install
 
 # Set up the database
 npm run db:setup

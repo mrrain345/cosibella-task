@@ -1,6 +1,6 @@
 services:
   app:
-    container_name: masterborn-app
+    container_name: cosibella-app
     build:
       context: app
       dockerfile: Dockerfile

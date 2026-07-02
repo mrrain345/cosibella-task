@@ -1,7 +1,7 @@
 {
-  "name": "masterborn",
+  "name": "cosibella-task",
   "version": "1.0.0",
-  "description": "MasterBorn recruitment task",
+  "description": "Cosibella recruitment task",
   "main": "src/main.ts",
   "scripts": {
     "start": "npm start --prefix app",
@@ -13,7 +13,7 @@
     "db:generate": "npm run db:generate --prefix app",
     "db:migrate": "npm run db:migrate --prefix app",
     "db:push": "npm run db:push --prefix app",
-    "db:setup": "npm run docker:start && npm run db:generate && npm run db:migrate && npm run docker:stop",
+    "db:setup": "npm run docker:start && npm run db:generate && npm run db:migrate; npm run docker:stop",
     "db:studio": "npm run db:studio --prefix app"
   },
   "author": "Kamil Majewski",

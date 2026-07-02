@@ -1,16 +1,14 @@
 {
-  "name": "masterborn-app",
+  "name": "cosibella-app",
   "version": "1.0.0",
   "main": "src/main.ts",
   "scripts": {
     "start": "NODE_ENV=production npx tsx src/main.ts",
     "dev": "npx tsx watch src/main.ts",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:generate": "npx drizzle-kit generate",
+    "db:migrate": "npx drizzle-kit migrate",
+    "db:push": "npx drizzle-kit push",
+    "db:studio": "npx drizzle-kit studio"
   },
   "author": "Kamil Majewski",
   "license": "MIT",
