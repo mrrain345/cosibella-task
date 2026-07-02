@@ -30,7 +30,7 @@ export class DatabaseService {
     )
   }
 
-  /** Upsert a single order along with its documents. */
+  /** Upsert a single order along with its documents atomically. */
   private async _upsertOrder(
     orderWithDocuments: OrderWithDocuments,
   ): Promise<void> {
@@ -40,35 +40,38 @@ export class DatabaseService {
       productsCost: this._extractProductsCost(orderWithDocuments).toFixed(2),
     }
 
-    const [upsertedOrder] = await this._db
-      .insert(orders)
-      .values(newOrder)
-      .onConflictDoUpdate({
-        target: orders.orderId,
-        set: {
-          productsCost: newOrder.productsCost,
-          updatedAt: new Date(),
-        },
-      })
-      .returning({ id: orders.orderSerialNumber })
+    await this._db.transaction(async (tx) => {
+      const [upsertedOrder] = await tx
+        .insert(orders)
+        .values(newOrder)
+        .onConflictDoUpdate({
+          target: orders.orderId,
+          set: {
+            productsCost: newOrder.productsCost,
+            updatedAt: new Date(),
+          },
+        })
+        .returning({ id: orders.orderSerialNumber })
 
-    const salesConfirmation = orderWithDocuments.documents.find(
-      (d) => d.documentType === "sales_confirmation",
-    )
+      const salesConfirmation = orderWithDocuments.documents.find(
+        (d) => d.documentType === "sales_confirmation",
+      )
 
-    const vatInvoice = orderWithDocuments.documents.find(
-      (d) => d.documentType === "vat_invoice",
-    )
+      const vatInvoice = orderWithDocuments.documents.find(
+        (d) => d.documentType === "vat_invoice",
+      )
 
-    await Promise.all([
-      salesConfirmation &&
-        this._upsertSalesConfirmation(upsertedOrder.id, salesConfirmation),
-      vatInvoice && this._upsertVatInvoice(upsertedOrder.id, vatInvoice),
-    ])
+      await Promise.all([
+        salesConfirmation &&
+          this._upsertSalesConfirmation(tx, upsertedOrder.id, salesConfirmation),
+        vatInvoice && this._upsertVatInvoice(tx, upsertedOrder.id, vatInvoice),
+      ])
+    })
   }
 
   /** Upsert a sales confirmation document for a given internal order ID. */
   private async _upsertSalesConfirmation(
+    tx: Parameters<Parameters<typeof this._db.transaction>[0]>[0],
     orderSerialNumber: number,
     doc: IdosellDocument,
   ): Promise<void> {
@@ -83,7 +86,7 @@ export class DatabaseService {
       pdfWithDocumentsInBase64: doc.pdfWithDocumentsInBase64 ?? null,
     }
 
-    await this._db
+    await tx
       .insert(salesConfirmations)
       .values(values)
       .onConflictDoUpdate({
@@ -101,6 +104,7 @@ export class DatabaseService {
 
   /** Upsert a VAT invoice document for a given internal order ID. */
   private async _upsertVatInvoice(
+    tx: Parameters<Parameters<typeof this._db.transaction>[0]>[0],
     orderSerialNumber: number,
     doc: IdosellDocument,
   ): Promise<void> {
@@ -119,7 +123,7 @@ export class DatabaseService {
       pdfWithDocumentsInBase64: doc.pdfWithDocumentsInBase64 ?? null,
     }
 
-    await this._db
+    await tx
       .insert(vatInvoices)
       .values(values)
       .onConflictDoUpdate({

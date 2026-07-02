@@ -18,13 +18,13 @@ async function stop() {
 }
 
 void start().catch((err) => {
-  logger.fatal(`Starting application failed: ${err}`)
+  logger.fatal(err, "Starting application failed")
   process.exit(1)
 })
 
 process.on("unhandledRejection", (reason, _promise) => {
-  logger.fatal(`Unhandled Rejection: ${reason}`)
+  logger.fatal({ reason }, "Unhandled Rejection")
 })
 
-process.on("SIGTERM", stop)
-process.on("SIGINT", stop)
+process.on("SIGTERM", () => void stop())
+process.on("SIGINT", () => void stop())

@@ -59,13 +59,10 @@ Drizzle Studio (dev mode only): https://local.drizzle.studio
 
 ## Testing
 
-```bash
-# Run tests once
-npm run test
-
-# Watch mode
-npm run test:watch
-```
+| Command              | Description    |
+| -------------------- | -------------- |
+| `npm run test`       | Run tests once |
+| `npm run test:watch` | Watch mode     |
 
 ## Database Commands
 

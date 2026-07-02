@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import { StatusCodes, ReasonPhrases } from "http-status-codes"
+// Side-effect import: augments req.log via pino-http
 import "../config/logger"
 
 /** Middleware for handling 404 Not Found errors. */

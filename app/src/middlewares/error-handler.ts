@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express"
 import { StatusCodes } from "http-status-codes"
 import "../config/logger"
 import z from "zod"
+import { env } from "../config/env"
 
 type HttpError = Error & { status?: number; statusCode?: number }
 
@@ -22,7 +23,7 @@ export function errorHandler(
     status,
     name: err.name,
     message: prettifyZodError(err),
-    cause: err.cause,
+    cause: env.NODE_ENV === "development" ? err.cause : undefined,
   }
 
   req.log.error({

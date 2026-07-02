@@ -2,7 +2,7 @@ import { env } from "../config/env"
 import { HttpError } from "http-errors-enhanced"
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH"
-type QueryValue = string | number | boolean | null
+type QueryValue = string | number | boolean
 type QueryType = Record<string, QueryValue>
 
 /** Options for making an HTTP request to the IdoSell API. */

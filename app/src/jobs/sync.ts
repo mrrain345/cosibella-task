@@ -8,6 +8,7 @@ export class SyncJob {
   private _ordersService: OrdersService
   private _databaseService: DatabaseService
   private _timer: NodeJS.Timeout | null = null
+  private _isRunning = false
 
   constructor(
     _ordersService: OrdersService = ordersService,
@@ -36,6 +37,12 @@ export class SyncJob {
 
   /** Run the job: fetch all orders and persist them to the database. */
   private async _run(): Promise<void> {
+    if (this._isRunning) {
+      logger.warn("Sync job skipped — previous run still in progress")
+      return
+    }
+
+    this._isRunning = true
     logger.info(
       `Sync job started (interval: ${env.IDOSELL_SYNC_INTERVAL_SEC} sec)`,
     )
@@ -46,6 +53,8 @@ export class SyncJob {
       logger.info(`Sync job completed — ${orders.length} orders upserted`)
     } catch (err) {
       logger.error(err, "Sync job failed")
+    } finally {
+      this._isRunning = false
     }
   }
 }

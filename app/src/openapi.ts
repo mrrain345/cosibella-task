@@ -119,7 +119,7 @@ registry.registerPath({
 registry.registerPath({
   method: "patch",
   path: "/api/orders/{orderSerialNumber}/cost",
-  summary: "Update products cost (partial)",
+  summary: "Update products cost",
   description: "Overrides the products cost for a given order.",
   request: {
     params: orderSerialNumberParam,

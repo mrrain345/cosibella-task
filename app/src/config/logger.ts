@@ -12,7 +12,10 @@ const transport = pino.transport({
   },
 })
 
-export const logger = pino(env.LOG_FORMAT === "pretty" ? transport : undefined)
+export const logger = pino(
+  { level: env.LOG_LEVEL },
+  env.LOG_FORMAT === "pretty" ? transport : undefined,
+)
 
 export const loggerHttp = pinoHttp({
   logger,

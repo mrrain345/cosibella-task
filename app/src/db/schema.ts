@@ -31,7 +31,8 @@ export const orders = pgTable("orders", {
     .notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
-    .notNull(),
+    .notNull()
+    .$onUpdateFn(() => new Date()),
 })
 
 export const salesConfirmations = pgTable("sales_confirmations", {
@@ -50,7 +51,8 @@ export const salesConfirmations = pgTable("sales_confirmations", {
     .notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
-    .notNull(),
+    .notNull()
+    .$onUpdateFn(() => new Date()),
 })
 
 export const vatInvoices = pgTable("vat_invoices", {
@@ -73,7 +75,8 @@ export const vatInvoices = pgTable("vat_invoices", {
     .notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
-    .notNull(),
+    .notNull()
+    .$onUpdateFn(() => new Date()),
 })
 
 export const ordersRelations = relations(orders, ({ one }) => ({
