@@ -16,6 +16,7 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.5.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
@@ -26,6 +27,7 @@
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
     "pino-http-print": "^4.0.0",
+    "swagger-ui-express": "^5.0.1",
     "tsx": "^4.22.4",
     "zod": "^4.4.3"
   },
@@ -34,6 +36,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.0",
     "@types/pg": "^8.15.5",
+    "@types/swagger-ui-express": "^4.1.8",
     "drizzle-kit": "^0.31.4",
     "vitest": "^4.1.9"
   }

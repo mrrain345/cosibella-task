@@ -2,6 +2,10 @@
 
 Recruitment application for Cosibella
 
+In the development mode Drizzle Studio is available at https://local.drizzle.studio
+
+Swagger documentation is available at http://localhost:3000/docs when the application is running.
+
 ## Requirements
 
 - npm
@@ -83,5 +87,3 @@ npm run db:push
 # Clean the database (deletes the database volume and the drizzle folder)
 npm run db:clean
 ```
-
-In the development mode Drizzle Studio is available at https://local.drizzle.studio
