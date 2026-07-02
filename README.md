@@ -69,6 +69,9 @@ npm run db:migrate
 # Apply schema changes directly to the database
 # Use with caution, requires `docker:start` to be running
 npm run db:push
+
+# Clean the database (deletes the database volume and the drizzle folder)
+npm run db:clean
 ```
 
 In the development mode Drizzle Studio is available at https://local.drizzle.studio
