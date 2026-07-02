@@ -3,7 +3,7 @@ import {
   idosellDocumentSchema,
   idosellDocumentTypeSchema,
 } from "../schemas/document"
-import { idosellRequest } from "./idosell-client"
+import { IdosellClient, idosellClient } from "./idosell-client"
 
 const documentsQuery = z.object({
   orderSerialNumber: z.number().int().positive(),
@@ -17,16 +17,27 @@ const documentsResponse = z.object({
 export type IdosellDocumentsQuery = z.infer<typeof documentsQuery>
 export type IdosellDocumentsResponse = z.infer<typeof documentsResponse>
 
-export async function getIdosellDocuments(
-  query: IdosellDocumentsQuery,
-): Promise<IdosellDocumentsResponse> {
-  const parsedQuery = documentsQuery.parse(query)
+/** IdoSell documents lookup endpoint. */
+export class IdosellDocumentsModel {
+  private _client: IdosellClient
 
-  const response = await idosellRequest<unknown>({
-    path: "/orders/documents",
-    method: "GET",
-    query: parsedQuery,
-  })
+  constructor(client: IdosellClient = idosellClient) {
+    this._client = client
+  }
 
-  return documentsResponse.parse(response)
+  /** Get documents for a specific order. */
+  async get(query: IdosellDocumentsQuery): Promise<IdosellDocumentsResponse> {
+    const parsedQuery = documentsQuery.parse(query)
+
+    const response = await this._client.request<unknown>({
+      method: "GET",
+      path: "/orders/documents",
+      query: parsedQuery,
+    })
+
+    return documentsResponse.parse(response)
+  }
 }
+
+/** Shared documents model instance wired to the default IdoSell client. */
+export const idosellDocumentsModel = new IdosellDocumentsModel()

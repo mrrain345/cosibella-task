@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { idosellRequest } from "./idosell-client"
+import { IdosellClient, idosellClient } from "./idosell-client"
 import { idosellOrderSchema } from "../schemas/order"
 
 const searchParams = z.object({
@@ -20,16 +20,29 @@ const searchResponse = z.object({
 export type IdosellOrdersSearchParams = z.infer<typeof searchParams>
 export type IdosellOrdersSearchResponse = z.infer<typeof searchResponse>
 
-export async function searchIdosellOrders(
-  params: IdosellOrdersSearchParams,
-): Promise<IdosellOrdersSearchResponse> {
-  const parsedParams = searchParams.parse(params)
+/** IdoSell orders search endpoint. */
+export class IdosellOrdersModel {
+  private _client: IdosellClient
 
-  const response = await idosellRequest({
-    path: "/orders/orders/search",
-    method: "POST",
-    body: { params: parsedParams },
-  })
+  constructor(client: IdosellClient = idosellClient) {
+    this._client = client
+  }
 
-  return searchResponse.parse(response)
+  /** Search for orders using the specified parameters. */
+  async search(
+    params: IdosellOrdersSearchParams,
+  ): Promise<IdosellOrdersSearchResponse> {
+    const parsedParams = searchParams.parse(params)
+
+    const response = await this._client.request({
+      method: "POST",
+      path: "/orders/orders/search",
+      body: { params: parsedParams },
+    })
+
+    return searchResponse.parse(response)
+  }
 }
+
+/** Shared orders model instance wired to the default IdoSell client. */
+export const idosellOrdersModel = new IdosellOrdersModel()
