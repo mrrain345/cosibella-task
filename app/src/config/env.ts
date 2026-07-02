@@ -9,12 +9,13 @@ dotenv.config({
 const EnvSchema = z.object({
   DOCKER: z.coerce.boolean().default(false),
   PORT: z.coerce.number().default(3000),
-  LOG_LEVEL: z
-    .enum(["trace", "debug", "info", "warn", "error"])
-    .default("info"),
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
+  LOG_LEVEL: z
+    .enum(["trace", "debug", "info", "warn", "error"])
+    .default("info"),
+  LOG_FORMAT: z.enum(["pretty", "json"]).default("pretty"),
 
   IDOSELL_DOMAIN: z.string().nonempty(),
   IDOSELL_API_KEY: z.string().nonempty(),
@@ -28,10 +29,6 @@ const EnvSchema = z.object({
 })
 
 export const env = EnvSchema.parse(process.env)
-
-export const DEVELOPMENT_MODE = env.NODE_ENV === "development"
-export const PRODUCTION_MODE = env.NODE_ENV === "production"
-export const TEST_MODE = env.NODE_ENV === "test"
 
 if (!env.DOCKER) env.POSTGRES_HOST = "localhost"
 export const DATABASE_URL = `postgresql://${env.POSTGRES_USER}:${env.POSTGRES_PASSWORD}@${env.POSTGRES_HOST}:${env.POSTGRES_PORT}/${env.POSTGRES_DB}`

@@ -12,6 +12,7 @@ services:
       - NODE_ENV=production
       - PORT=${PORT}
       - LOG_LEVEL=${LOG_LEVEL}
+      - LOG_FORMAT=${LOG_FORMAT}
       
       - IDOSELL_DOMAIN=${IDOSELL_DOMAIN}
       - IDOSELL_API_KEY=${IDOSELL_API_KEY}

@@ -1,5 +1,5 @@
 import pino from "pino"
-import { DEVELOPMENT_MODE } from "./env"
+import { env } from "./env"
 import { pinoHttp } from "pino-http"
 
 const transport = pino.transport({
@@ -12,7 +12,7 @@ const transport = pino.transport({
   },
 })
 
-export const logger = pino(DEVELOPMENT_MODE ? transport : undefined)
+export const logger = pino(env.LOG_FORMAT === "pretty" ? transport : undefined)
 
 export const loggerHttp = pinoHttp({
   logger,
