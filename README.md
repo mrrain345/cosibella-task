@@ -1,6 +1,8 @@
-# Cosibella
+# Cosibella Recruitment Task
 
-A Node.js backend service that integrates with the **IdoSell** e-commerce platform — synchronizing orders and their documents in the background, storing them in PostgreSQL, and exposing a REST API.
+A Node.js backend service that integrates with the **IdoSell** e-commerce platform — synchronizing orders and their documents in the background, storing them in PostgreSQL.
+
+The REST API exposes endpoints for fetching orders and updating their costs. Cost updates support manual overrides that are stored in a separate override field, so subsequent synchronization jobs can continue updating source-synced values without overwriting the persisted override.
 
 ## Requirements
 
