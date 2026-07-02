@@ -51,6 +51,16 @@ npm run docker:stop
 
 ```
 
+Tests:
+
+```bash
+# Run tests
+npm run test
+
+# Watch tests
+npm run: test:watch
+```
+
 ## Drizzle commands
 
 ```bash
