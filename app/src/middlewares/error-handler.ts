@@ -1,8 +1,14 @@
 import { Request, Response, NextFunction } from "express"
 import { StatusCodes } from "http-status-codes"
+import "../config/logger"
+import z from "zod"
 
 type HttpError = Error & { status?: number; statusCode?: number }
 
+/**
+ * Middleware for handling errors.
+ * It logs the error and sends an error response to the client.
+ */
 export function errorHandler(
   err: HttpError,
   req: Request,
@@ -15,7 +21,7 @@ export function errorHandler(
   const error = {
     status,
     name: err.name,
-    message: err.message,
+    message: prettifyZodError(err),
     cause: err.cause,
   }
 
@@ -27,4 +33,13 @@ export function errorHandler(
   })
 
   res.status(status).send({ error })
+}
+
+/** Prettify Zod error messages for better readability. */
+function prettifyZodError(error: Error): string {
+  if (error instanceof z.ZodError) {
+    return z.prettifyError(error)
+  } else {
+    return error.message
+  }
 }
