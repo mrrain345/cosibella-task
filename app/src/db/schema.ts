@@ -22,6 +22,10 @@ export const orders = pgTable("orders", {
   orderSerialNumber: integer("order_serial_number").primaryKey(),
   orderId: varchar("order_id", { length: 64 }).notNull().unique(),
   productsCost: numeric("products_cost", { precision: 14, scale: 2 }).notNull(),
+  productsCostOverride: numeric("products_cost_override", {
+    precision: 14,
+    scale: 2,
+  }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

@@ -4,3 +4,13 @@ import { ordersController } from "../controllers/orders"
 export const ordersRouter = Router()
 
 ordersRouter.get("/api/orders", ordersController.getOrders)
+
+ordersRouter.patch(
+  "/api/orders/:orderSerialNumber/cost",
+  ordersController.updateProductsCost,
+)
+
+ordersRouter.put(
+  "/api/orders/:orderSerialNumber/cost",
+  ordersController.updateProductsCost,
+)

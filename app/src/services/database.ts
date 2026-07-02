@@ -1,4 +1,4 @@
-import { asc } from "drizzle-orm"
+import { asc, eq } from "drizzle-orm"
 import { db } from "../db/client"
 import {
   NewOrder,
@@ -55,6 +55,7 @@ export class DatabaseService {
     const salesConfirmation = orderWithDocuments.documents.find(
       (d) => d.documentType === "sales_confirmation",
     )
+
     const vatInvoice = orderWithDocuments.documents.find(
       (d) => d.documentType === "vat_invoice",
     )
@@ -142,7 +143,7 @@ export class DatabaseService {
   async getOrders(options: GetOrdersOptions = {}) {
     const { withPdf = false } = options
 
-    return this._db.query.orders.findMany({
+    const rows = await this._db.query.orders.findMany({
       with: {
         salesConfirmation: {
           columns: { pdfWithDocumentsInBase64: withPdf },
@@ -153,6 +154,26 @@ export class DatabaseService {
       },
       orderBy: asc(orders.orderSerialNumber),
     })
+
+    // If a products cost override exists, use it instead of the original products cost.
+    return rows.map(({ productsCost, productsCostOverride, ...rest }) => ({
+      ...rest,
+      productsCost: productsCostOverride ?? productsCost,
+    }))
+  }
+
+  /** Update only the products cost override for a single order. */
+  async updateProductsCost(
+    orderSerialNumber: number,
+    cost: string,
+  ): Promise<boolean> {
+    const result = await this._db
+      .update(orders)
+      .set({ productsCostOverride: cost, updatedAt: new Date() })
+      .where(eq(orders.orderSerialNumber, orderSerialNumber))
+      .returning({ orderSerialNumber: orders.orderSerialNumber })
+
+    return result.length > 0
   }
 
   /** Extract the products cost from an IdoSell order. */
